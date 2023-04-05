@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Test
-    run-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -28,7 +28,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: 1.20
+          go-version: ^1.20
         id: go
 
       - name: check out the code into go module directory
