@@ -1,3 +1,6 @@
+network:
+	docker network create wallet-network
+
 postgres:
 	docker run --name postgres12 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
 	
@@ -31,4 +34,4 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/Dev-El-badry/wallet-system/db/sqlc Store
 
-.PHONY: createdb dropdb migrateup migratedown sqlc test server mock migrateup1 migratedown1
+.PHONY: createdb dropdb migrateup migratedown sqlc test server mock migrateup1 migratedown1 network
