@@ -6,21 +6,20 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Dev-El-badry/wallet-system/util"
 	_ "github.com/lib/pq"
-)
-
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable"
 )
 
 var testQueries *Queries
 var testDB *sql.DB
 
 func TestMain(m *testing.M) {
-	var err error
+	conf, err := util.LoadConfig("../..")
+	if err != nil {
+		log.Fatal("can't load config file", err)
+	}
 
-	testDB, err = sql.Open(dbDriver, dbSource)
+	testDB, err := sql.Open(conf.DBDriver, conf.DBSource)
 	if err != nil {
 		log.Fatal("can not connect to db", err)
 	}
