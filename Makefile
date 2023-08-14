@@ -1,3 +1,5 @@
+DB_URL=postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable
+
 network:
 	docker network create wallet-network
 
@@ -11,16 +13,25 @@ dropdb:
 	docker exec -it postgres12 dropdb simple_bank
 
 migrateup:
-	migrate --path db/migrations/ -database "postgresql://root:ryIpE40RiIUmVGOISdiN@database-2.cp6nlcwr9eay.eu-central-1.rds.amazonaws.com:5432/simple_bank" -verbose up
+	migrate --path db/migrations/ -database "${DB_URL}" -verbose up
 
 migratedown:
-	migrate --path db/migrations/ -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down
+	migrate --path db/migrations/ -database "${DB_URL}" -verbose down
 
 migrateup1:
-	migrate --path db/migrations/ -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up 1
+	migrate --path db/migrations/ -database "${DB_URL}" -verbose up 1
 
 migratedown1:
-	migrate --path db/migrations/ -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down 1
+	migrate --path db/migrations/ -database "${DB_URL}" -verbose down 1
+
+new_migration:
+	migrate create -ext sql -dir db/migrations -seq $(name)
+
+db_docs:
+	dbdocs build doc/db.dbml
+
+db_schema:
+	dbml2sql --postgres -o doc/schema.sql doc/db.dbml
 
 sqlc:
 	sqlc generate
@@ -34,4 +45,17 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/Dev-El-badry/wallet-system/db/sqlc Store
 
-.PHONY: createdb dropdb migrateup migratedown sqlc test server mock migrateup1 migratedown1 network
+proto:
+	rm -f pb/*.go
+	rm -f doc/swagger/*.swagger.json
+	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
+    --go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+		--grpc-gateway_out=pb --grpc-gateway_opt=paths=source_relative \
+		--openapiv2_out=doc/swagger --openapiv2_opt=allow_merge=true,merge_file_name=simple_wallet \
+    proto/*.proto
+		statik -src=./doc/swagger -dest=./doc
+		
+evans:
+	evans --host localhost --port 9000 -r repl
+
+.PHONY: createdb dropdb migrateup migratedown sqlc test server mock migrateup1 migratedown1 db_docs db_schema network new_migration proto evans
