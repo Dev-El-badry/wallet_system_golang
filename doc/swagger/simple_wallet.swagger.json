@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Simple Wallet APIs",
-    "version": "1.0",
+    "version": "1.2",
     "contact": {
       "name": "simple wallet project",
       "url": "github.com/Dev-El-badry/wallet-system",
@@ -23,6 +23,8 @@
   "paths": {
     "/v1/create_user": {
       "post": {
+        "summary": "Create new user",
+        "description": "Use this API to create a new user",
         "operationId": "SimpleWallet_createUser",
         "responses": {
           "200": {
@@ -53,8 +55,44 @@
         ]
       }
     },
+    "/v1/update_user": {
+      "patch": {
+        "summary": "Update user",
+        "description": "Use this API to update user",
+        "operationId": "SimpleWallet_updateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUpdateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbUpdateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SimpleWallet"
+        ]
+      }
+    },
     "/v1/user_login": {
       "post": {
+        "summary": "Login user",
+        "description": "Use this API to login user and get access token \u0026 refresh token",
         "operationId": "SimpleWallet_login",
         "responses": {
           "200": {
@@ -145,6 +183,35 @@
         "refreshTokenExpiredAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "pbUpdateUserRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "fullName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "passwordChangedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbUpdateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
         }
       }
     },

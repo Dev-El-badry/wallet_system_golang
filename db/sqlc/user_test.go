@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -52,4 +53,21 @@ func TestGetUser(t *testing.T) {
 
 	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, time.Second)
 	require.WithinDuration(t, user1.PasswordChangedAt, user2.PasswordChangedAt, time.Second)
+}
+
+func TestUpdateUserFullName(t *testing.T) {
+	oldUser := createRandomUser(t)
+	newFullName := util.RandomString(20)
+
+	updateUser, err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
+		Username: oldUser.Username,
+		FullName: sql.NullString{
+			String: newFullName,
+			Valid:  true,
+		},
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, updateUser.FullName, newFullName)
+	require.Equal(t, oldUser.Email, updateUser.Email)
 }

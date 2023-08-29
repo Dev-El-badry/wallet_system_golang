@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	SimpleWallet_CreateUser_FullMethodName = "/pb.SimpleWallet/createUser"
+	SimpleWallet_UpdateUser_FullMethodName = "/pb.SimpleWallet/updateUser"
 	SimpleWallet_Login_FullMethodName      = "/pb.SimpleWallet/login"
 )
 
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SimpleWalletClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	Login(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 }
 
@@ -48,6 +50,15 @@ func (c *simpleWalletClient) CreateUser(ctx context.Context, in *CreateUserReque
 	return out, nil
 }
 
+func (c *simpleWalletClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
+	out := new(UpdateUserResponse)
+	err := c.cc.Invoke(ctx, SimpleWallet_UpdateUser_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *simpleWalletClient) Login(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error) {
 	out := new(LoginUserResponse)
 	err := c.cc.Invoke(ctx, SimpleWallet_Login_FullMethodName, in, out, opts...)
@@ -62,6 +73,7 @@ func (c *simpleWalletClient) Login(ctx context.Context, in *LoginUserRequest, op
 // for forward compatibility
 type SimpleWalletServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	Login(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	mustEmbedUnimplementedSimpleWalletServer()
 }
@@ -72,6 +84,9 @@ type UnimplementedSimpleWalletServer struct {
 
 func (UnimplementedSimpleWalletServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedSimpleWalletServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
 func (UnimplementedSimpleWalletServer) Login(context.Context, *LoginUserRequest) (*LoginUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
@@ -107,6 +122,24 @@ func _SimpleWallet_CreateUser_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SimpleWallet_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleWalletServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SimpleWallet_UpdateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleWalletServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _SimpleWallet_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LoginUserRequest)
 	if err := dec(in); err != nil {
@@ -135,6 +168,10 @@ var SimpleWallet_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "createUser",
 			Handler:    _SimpleWallet_CreateUser_Handler,
+		},
+		{
+			MethodName: "updateUser",
+			Handler:    _SimpleWallet_UpdateUser_Handler,
 		},
 		{
 			MethodName: "login",
